@@ -1,2 +1,2 @@
 # DB-homework
-Homework for course Introduction to Database Systems
+Homework for course *Introduction to Database Systems*.
