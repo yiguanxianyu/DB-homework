@@ -2,10 +2,13 @@ import os
 import json
 import encryption
 from student import student
+from StudentData import studentData
 
 
 def saveToFile(dataSet):
-
+    f = open('students.dat', 'wb+')
+    f.seek(0)
+    f.truncate()
     toFile = dict()
     for stuID, stu in dataSet.students.items():
         toFile[stuID] = stu.getAll()
@@ -13,36 +16,33 @@ def saveToFile(dataSet):
     data = json.dumps(toFile)
     key = input("请输入密码（不超过32位）：")
     ciptext = encryption.encrypt(data, key)
-
-    with open('students.dat', 'wb+') as f:
-        f.write(ciptext)
+    f.write(ciptext)
+    f.close()
 
 
 def readFromFile(dataSet):
-    try:
-        with open('students.dat', 'rb') as f:
-            ciptext = f.read()
+    f = open('students.dat', 'rb')
+    ciptext = f.read()
+    key = input("请输入密码：")
+    data = encryption.decrypt(ciptext, key)
+    fromFile = json.loads(data)
+    for stuID, tempDict in fromFile.items():
 
-        key = input("请输入密码：")
-        data = encryption.decrypt(ciptext, key)
-        fromFile = json.loads(data)
-        for stuID, tempDict in fromFile.items():
+        studentInformation = [
+            tempDict["name"], tempDict["id"], tempDict["birthday"],
+            tempDict["school"], tempDict["department"]
+        ]
 
-            studentInformation = [
-                tempDict["name"], tempDict["id"], tempDict["birthday"],
-                tempDict["school"], tempDict["department"]
-            ]
+        stu = student(studentInformation)
+        stu.courses = tempDict["courses"]
+        dataSet.students[stuID] = stu
 
-            stu = student(studentInformation)
-            stu.courses = tempDict["courses"]
-            dataSet.students[stuID] = stu
+        if stu.name not in dataSet.nameToID:
+            dataSet.nameToID[stu.name] = set([stu.id])
+        else:
+            dataSet.nameToID[stu.name].add(stu.id)
 
-            if stu.name not in dataSet.nameToID:
-                dataSet.nameToID[stu.name] = set([stu.id])
-            else:
-                dataSet.nameToID[stu.name].add(stu.id)
-    except FileNotFoundError:
-        pass
+    f.close()
 
 
 def showWelcomeScreen():
@@ -66,3 +66,44 @@ def showWelcomeScreen():
             continue
 
     return returnCode
+
+
+def run():
+    dataSet = studentData()
+
+    readFromFile(dataSet)
+
+    while 1:
+
+        i = showWelcomeScreen()
+
+        if i == 0:
+            dataSet.showAllStudents()
+
+        elif i == 1:
+            dataSet.getStudentInformation()
+
+        elif i == 2:
+            dataSet.addStudentInformation()
+
+        elif i == 3:
+            dataSet.editStudentInformation()
+
+        elif i == 4:
+            dataSet.deleteStudentInformation()
+
+        elif i == 5:
+            dataSet.getStudentScore()
+
+        elif i == 6:
+            dataSet.addStudentScore()
+
+        elif i == 7:
+            dataSet.editStudentScore()
+
+        elif i == 8:
+            dataSet.deleteStudentScore()
+
+        elif i == 9:
+            saveToFile(dataSet)
+            return

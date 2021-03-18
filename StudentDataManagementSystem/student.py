@@ -1,20 +1,11 @@
 class studentWithoutCourse:
     def __init__(self, si):
-        # si for studentInformation
+        # si for student information
         self.name = si[0]
         self.id = si[1]
         self.birthday = si[2]
         self.school = si[3]
         self.department = si[4]
-
-    def __str__(self):
-
-        return self.__repr__()
-
-    def __repr__(self):
-
-        # return json.dumps(self.getAll())
-        return self.getAll()
 
     def getAll(self):
         """返回包含着学生所有信息的字典"""
@@ -31,7 +22,7 @@ class studentWithoutCourse:
 
 class student(studentWithoutCourse):
     def __init__(self, si):
-        # si for studentInformation
+        # si for student information
         self.name = "N/A" if (si[0] == '') else si[0]
         self.id = "N/A" if (si[1] == '') else si[1]
         self.birthday = "N/A" if (si[2] == '') else si[2]
